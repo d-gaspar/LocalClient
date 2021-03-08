@@ -34,7 +34,7 @@ class Client {
                     connected = false
 
                     val input = readLine() ?: ""
-                    writer.write("{\"key\"}:{\"$key\"}".toByteArray(Charset.defaultCharset()))
+                    writer.write("{\"key\":\"$key\"}".toByteArray(Charset.defaultCharset()))
 
                     reader.close()
                     server?.close()
