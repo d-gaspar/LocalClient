@@ -12,20 +12,70 @@ import java.util.*
 class Client {
     private var server : Socket? = null
     private var connected : Boolean = false
-    private var host : String = "localhost"
+    private var ip : String = "localhost"
     private var port : Int = 8080
 
-    constructor(host : String = "localhost", port : Int = 8080) {
-        this.host = host
+    var writer : OutputStream? = null
+
+    constructor(ip : String = "localhost", port : Int = 8080) {
+        this.ip = ip
         this.port = port
     }
 
-    fun run(key : String) {
+    /*******************************************************************************************/
+
+    fun connect() : Boolean {
+        return try {
+            server = Socket(ip, port)
+            writer = server?.getOutputStream()
+            connected = true
+            println("Connected on $ip:${port}")
+            true
+        } catch (e : IOException) {
+            false
+        }
+    }
+
+    /*******************************************************************************************/
+
+    fun disconnect() {
+        server?.close()
+    }
+
+    /*******************************************************************************************/
+
+    fun sendJson(key : String, action : String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                server = Socket(host, port)
+                //var reader : Scanner = Scanner(server!!.getInputStream())
+                //var writer : OutputStream = server!!.getOutputStream()
+
+                //while(connected) {
+                    //connected = false
+
+                //val input = readLine() ?: ""
+                //println("AAAAAAAAAA1")
+                writer?.write("{\"key\":\"$key\",\"action\":\"$action\"}".toByteArray(Charset.defaultCharset()))
+                //println("AAAAAAAAAA2")
+                //writer.close()
+                //println("AAAAAAAAAA3")
+                    //reader.close()
+                    //server?.close()
+                //}
+            } catch (e : IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /*******************************************************************************************/
+
+    /*fun run(key : String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                server = Socket(ip, port)
                 connected = true
-                println("Connected on $host:${port.toString()}")
+                println("Connected on $ip:${port.toString()}")
 
                 var reader : Scanner = Scanner(server!!.getInputStream())
                 var writer : OutputStream = server!!.getOutputStream()
@@ -43,5 +93,5 @@ class Client {
                 e.printStackTrace()
             }
         }
-    }
+    }*/
 }
