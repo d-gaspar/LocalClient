@@ -6,4 +6,4 @@ Enter the socket server IP
 
 Type the keys to send commands to desired PC
 
-![Game Controller](readmeImages/gameController.png|height=200px)
+<img src="readmeImages/gameController.png" height="200">
