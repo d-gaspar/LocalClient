@@ -2,7 +2,7 @@
  
 Enter the socket server IP
 
-![Main](readmeImages/main.png)
+<img src="readmeImages/main.png" height="200">
 
 Type the keys to send commands to desired PC
 
