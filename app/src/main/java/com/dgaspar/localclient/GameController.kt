@@ -6,8 +6,14 @@ import android.view.MotionEvent
 import android.view.View.OnTouchListener
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 class GameController : AppCompatActivity() {
+
+    var keysDownHashMap : HashMap<String, Int> = HashMap()
+
+    /*******************************************************************************************/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,21 +28,45 @@ class GameController : AppCompatActivity() {
         buttonListener(R.id.b)
     }
 
+    /*******************************************************************************************/
+
     @SuppressLint("ClickableViewAccessibility")
     fun buttonListener(id : Int) {
         var button : Button = findViewById(id)
 
         var key : String = ""
         when (id) {
-            R.id.left -> "LEFT"
-            R.id.up -> "UP"
-            R.id.right -> "RIGHT"
-            R.id.down -> "DOWN"
+            R.id.left -> key = "LEFT"
+            R.id.up -> key = "UP"
+            R.id.right -> key = "RIGHT"
+            R.id.down -> key = "DOWN"
 
             R.id.a -> key = "A"
             R.id.b -> key = "B"
         }
 
+        // continue to send when action DOWN
+        var keyAux : Int = 0
+        button.setOnTouchListener(OnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    keyAux++
+                    keysDownHashMap[key] = keyAux
+                    CoroutineScope(Dispatchers.IO).launch {
+                        keyPress(key, keyAux)
+                    }
+                }
+                MotionEvent.ACTION_UP -> {
+                    keysDownHashMap[key] = 0
+                }
+                //MotionEvent.ACTION_UP -> keysDown.remove(key) //CLIENT?.sendJson(key, "UP")
+            }
+
+            true
+        })
+
+        /*
+        // only send json when command is alternate, which means, when is UP and then DOWN
         var previousEvent = MotionEvent.ACTION_UP
         button.setOnTouchListener(OnTouchListener { _, event ->
             if (event.action != previousEvent) {
@@ -49,5 +79,20 @@ class GameController : AppCompatActivity() {
 
             true
         })
+        */
     }
+
+    /*******************************************************************************************/
+
+    private fun keyPress(key : String, keyPressedId : Int) {
+        CLIENT?.sendJson("{\"key\":\"$key\",\"action\":\"DOWN\"}\n")
+        Thread.sleep(500)
+
+        while (keysDownHashMap[key] == keyPressedId) {
+            CLIENT?.sendJson("{\"key\":\"$key\",\"action\":\"DOWN\"}\n")
+
+            Thread.sleep(100)
+        }
+    }
+
 }
