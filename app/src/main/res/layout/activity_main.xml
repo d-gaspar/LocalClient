@@ -139,7 +139,7 @@
                     android:layout_height="50dp"
                     android:layout_margin="2dp"
                     android:gravity="center_horizontal"
-                    android:text="13"
+                    android:text="7"
                     android:inputType="number"
                     android:textColor="@color/text"
                 />

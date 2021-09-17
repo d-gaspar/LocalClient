@@ -74,20 +74,28 @@ class MainActivity : AppCompatActivity() {
 
         println("IP: $ip")
 
-        CLIENT = Client(ip, 8080)
+        var passEditText : EditText = findViewById(R.id.pass)
+        var pass : String = passEditText.text.toString()
+
+        CLIENT = Client(ip, 8080, pass)
 
         // connect
         var intent = Intent(this, GameController::class.java)
         CoroutineScope(Dispatchers.IO).launch {
-            if (CLIENT!!.connect()) {
-                println("OPEN MODULES")
-                withContext(Dispatchers.Main) {
-                    message.text = ""
-                    startActivity(intent)
-                }
-            } else {
-                withContext(Dispatchers.Main) {
-                    message.text = "Connection failed!"
+            CLIENT!!.connect().let {
+                if (it.first) {
+                    println("OPEN MODULES")
+
+                    intent.putExtra("playerColor", it.second)
+
+                    withContext(Dispatchers.Main) {
+                        message.text = ""
+                        startActivity(intent)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        message.text = it.second
+                    }
                 }
             }
         }

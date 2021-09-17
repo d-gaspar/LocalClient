@@ -1,11 +1,15 @@
 package com.dgaspar.localclient
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View.OnTouchListener
 import android.widget.Button
+import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -18,6 +22,11 @@ class GameController : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_controller)
+
+        // player color
+        var backgroundColor : RelativeLayout = findViewById(R.id.body)
+        var playerColor : String = intent.getStringExtra("playerColor").let { it ?: "#000000" }
+        backgroundColor.setBackgroundColor(Color.parseColor(playerColor))
 
         buttonListener(R.id.left)
         buttonListener(R.id.up)
@@ -85,11 +94,11 @@ class GameController : AppCompatActivity() {
     /*******************************************************************************************/
 
     private fun keyPress(key : String, keyPressedId : Int) {
-        CLIENT?.sendJson("{\"key\":\"$key\",\"action\":\"DOWN\"}\n")
+        CLIENT?.sendJson("{\"key\":\"controllerDown\",\"value\":\"$key\"}\n")
         Thread.sleep(500)
 
         while (keysDownHashMap[key] == keyPressedId) {
-            CLIENT?.sendJson("{\"key\":\"$key\",\"action\":\"DOWN\"}\n")
+            CLIENT?.sendJson("{\"key\":\"controllerDown\",\"value\":\"$key\"}\n")
 
             Thread.sleep(100)
         }
